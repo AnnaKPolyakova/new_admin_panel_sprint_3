@@ -1,0 +1,13 @@
+.env
+db.sqlite3
+
+# Venv
+venv
+.venv
+.python-version
+
+# Docker
+docker
+
+# IDE
+.idea

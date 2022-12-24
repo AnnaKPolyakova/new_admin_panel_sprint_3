@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:12.4
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./db_sql_copy:/docker-entrypoint-initdb.d
+    env_file:
+      - ./.env
+
+    healthcheck:
+      test: "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+      timeout: 2s
+      retries: 30
+
+  redis:
+    image: redis
+    restart: always
+    volumes:
+    - ./storage/redis/data:/data
+    ports:
+    - 6379:6379
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: .
+    restart: always
+    volumes:
+      - static_value:/code/static/
+      - media_value:/code/media/
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+      - redis
+
+  nginx:
+    image: nginx:1.19.3
+    ports:
+      - "80:80"
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - static_value:/var/html/static/
+      - media_value:/var/html/media/
+
+    depends_on:
+      - web
+      - db
+      - redis
+
+volumes:
+  postgres_data:
+  static_value:
+  media_value:
