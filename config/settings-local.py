@@ -1,7 +1,6 @@
 from split_settings.tools import include
 
 include(
-    "components/base/debug-local.py",
     "components/base/base.py",
     "components/base/application_definition.py",
     "components/base/password_validators.py",
