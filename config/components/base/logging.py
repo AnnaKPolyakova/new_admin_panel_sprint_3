@@ -1,6 +1,9 @@
 import os
 
 if int(os.environ.get('LOGGING_ON', 0)) == 1:
+    LOG_FILE = os.getenv('LOG_FILE', 'tes-play.log')
+    LOG_PATH = os.getenv('LOG_PATH', '')
+    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': True,
@@ -13,6 +16,11 @@ if int(os.environ.get('LOGGING_ON', 0)) == 1:
             'default': {
                 'format': '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]',
             },
+            'verbose': {
+                'format': '[{asctime}] [{name}] [{levelname}] {module} > {message}',
+                'style': '{',
+                "format_date": '%Y-%m-%d %H:%M:%S',
+            },
         },
         'handlers': {
             'debug-console': {
@@ -20,12 +28,23 @@ if int(os.environ.get('LOGGING_ON', 0)) == 1:
                 'formatter': 'default',
                 'filters': ['require_debug_true'],
             },
+            'file': {
+                'level': LOG_LEVEL,
+                'class': 'logging.FileHandler',
+                'filename': LOG_FILE,
+                'formatter': 'verbose',
+            },
         },
         'loggers': {
             'django.db.backends': {
                 'level': 'DEBUG',
                 'handlers': ['debug-console'],
                 'propagate': False,
-            }
+            },
+            'logger': {
+                'handlers': ['debug-console', 'file'],
+                'level': LOG_LEVEL,
+                'propagate': True,
+            },
         },
     }
