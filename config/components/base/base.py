@@ -18,5 +18,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOCALE_PATHS = ["movies/locale"]
 
+LOCAL = int(os.environ.get('DEBUG', 0)) == 1
 
 PAGINATION_SIZE = os.environ.get("PAGINATION_SIZE", 50)

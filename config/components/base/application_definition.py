@@ -1,10 +1,5 @@
 from config.components.debug import DEBUG
 
-INSTALLED_APPS = [
-
-    "debug_toolbar",
-    "corsheaders",
-]
 
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -25,7 +20,8 @@ if DEBUG:
 
 
 LOCAL_APPS = [
-    "movies.apps.MoviesConfig"
+    "movies.apps.MoviesConfig",
+    "etl.apps.EtlConfig"
 ]
 
 
