@@ -22,3 +22,4 @@ typing==3.7.4.3
 typing_extensions==4.4.0
 
 redis~=4.4.0
+elasticsearch~=7.17.7

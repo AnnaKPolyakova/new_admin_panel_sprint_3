@@ -2,6 +2,8 @@ import datetime
 
 from django.core.management.base import BaseCommand
 
+from etl.servises.defines import MOVIES_INDEX, MOVIES
+from etl.servises.loader import Loader
 
 
 class Command(BaseCommand):
@@ -11,117 +13,66 @@ class Command(BaseCommand):
         from django.conf import settings
         hosts = '127.0.0.1:9200'
         from datetime import datetime
-        from elasticsearch import Elasticsearch
-        es = Elasticsearch(
-            ['http://127.0.0.1:9200']
+        from elasticsearch import Elasticsearch, helpers
+        es = Elasticsearch('http://localhost:9200')
+        mapping = '''{
+            "settings": {
+                "number_of_shards": 1
+            },
+            "mappings": {
+                "properties": {
+                    "field1": {"type": "text"}
+                    }
+                }
+            }'''
+        # a = es.info()
+        # print(a)
+        # res = es.indices.create(index="rrrrrr", ignore=400, body=mapping)
+        # # print(res)
+        # a = es.indices.get("rrrrrr")
+        # # print(a)
+        res = es.index(index=MOVIES, document={
+            "number_of_shards": '2374'
+        })
+        # print(res)
+        a = es.indices.get(MOVIES)
+        # print(a)
+        query = {
+            "match": {
+                "number_of_shards": "23"
+            }
+        }
+        a = es.update(
+            index=MOVIES,
+            id='KceRUIUBOj-ROrMmciEU',
+            body={"doc": {"number_of_shards": "11111111111"}}
         )
-        mapping = '''
-        {
-  "settings": {
-    "refresh_interval": "1s",
-    "analysis": {
-      "filter": {
-        "english_stop": {
-          "type":       "stop",
-          "stopwords":  "_english_"
-        },
-        "english_stemmer": {
-          "type": "stemmer",
-          "language": "english"
-        },
-        "english_possessive_stemmer": {
-          "type": "stemmer",
-          "language": "possessive_english"
-        },
-        "russian_stop": {
-          "type":       "stop",
-          "stopwords":  "_russian_"
-        },
-        "russian_stemmer": {
-          "type": "stemmer",
-          "language": "russian"
-        }
-      },
-      "analyzer": {
-        "ru_en": {
-          "tokenizer": "standard",
-          "filter": [
-            "lowercase",
-            "english_stop",
-            "english_stemmer",
-            "english_possessive_stemmer",
-            "russian_stop",
-            "russian_stemmer"
-          ]
-        }
-      }
-    }
-  },
-  "mappings": {
-    "dynamic": "strict",
-    "properties": {
-      "id": {
-        "type": "keyword"
-      },
-      "imdb_rating": {
-        "type": "float"
-      },
-      "genre": {
-        "type": "keyword"
-      },
-      "title": {
-        "type": "text",
-        "analyzer": "ru_en",
-        "fields": {
-          "raw": { 
-            "type":  "keyword"
-          }
-        }
-      },
-      "description": {
-        "type": "text",
-        "analyzer": "ru_en"
-      },
-      "director": {
-        "type": "text",
-        "analyzer": "ru_en"
-      },
-      "actors_names": {
-        "type": "text",
-        "analyzer": "ru_en"
-      },
-      "writers_names": {
-        "type": "text",
-        "analyzer": "ru_en"
-      },
-      "actors": {
-        "type": "nested",
-        "dynamic": "strict",
-        "properties": {
-          "id": {
-            "type": "keyword"
-          },
-          "name": {
-            "type": "text",
-            "analyzer": "ru_en"
-          }
-        }
-      },
-      "writers": {
-        "type": "nested",
-        "dynamic": "strict",
-        "properties": {
-          "id": {
-            "type": "keyword"
-          },
-          "name": {
-            "type": "text",
-            "analyzer": "ru_en"
-          }
-        }
-      }
-    }
-  }
-}'''
-        res = es.indices.create(index='test-index', body=mapping)
-        print(res['result'])
+        print(a)
+
+        from elasticsearch import Elasticsearch, helpers
+        res = helpers.bulk(
+            es,
+            [{"number_of_shards": "33333333"}],
+            index=MOVIES
+        )
+
+        res = helpers.bulk(
+            es,
+            [{
+                '_index': MOVIES,
+                '_op_type': 'update',
+                '_id': 'SceqUIUBOj-ROrMm6SHq',
+                'doc': {'number_of_shards': '1000000'}
+            }]
+        )
+
+        res = helpers.bulk(
+            es,
+            [{
+                '_index': MOVIES,
+                '_op_type': 'create',
+                'doc': {'number_of_shards': '12300000'}
+            }]
+        )
+
+        print(es.search(index=MOVIES, size=1000))

@@ -15,9 +15,18 @@ CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 LOCALE_PATHS = ["movies/locale"]
 
 LOCAL = int(os.environ.get('DEBUG', 0)) == 1
 
 PAGINATION_SIZE = os.environ.get("PAGINATION_SIZE", 50)
+
+SIZE_FOR_LOAD_TO_ELASTICSEARCH = os.environ.get(
+    "SIZE_FOR_LOAD_TO_ELASTICSEARCH", 50
+)
+
+HOSTNAME = 'localhost'
+
+PORT = 8000
+
+PROTOCOL = 'http'
