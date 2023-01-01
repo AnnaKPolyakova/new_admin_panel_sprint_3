@@ -13,3 +13,4 @@ docker
 # IDE
 .idea
 
+/etl/management/
