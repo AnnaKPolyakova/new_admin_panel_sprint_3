@@ -21,12 +21,12 @@ LOCAL = int(os.environ.get('DEBUG', 0)) == 1
 
 PAGINATION_SIZE = os.environ.get("PAGINATION_SIZE", 50)
 
-SIZE_FOR_LOAD_TO_ELASTICSEARCH = os.environ.get(
-    "SIZE_FOR_LOAD_TO_ELASTICSEARCH", 50
+SIZE_FOR_LOAD_TO_ELASTICSEARCH = int(
+    os.environ.get("SIZE_FOR_LOAD_TO_ELASTICSEARCH", 50)
 )
 
 HOSTNAME = 'localhost'
 
-PORT = 8000
+ELASTICSEARCH_PORT = os.environ.get("ELASTICSEARCH_PORT", 9200)
 
 PROTOCOL = 'http'

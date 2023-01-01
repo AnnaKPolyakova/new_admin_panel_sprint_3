@@ -103,13 +103,13 @@ class FilmWork(UUIDMixin, TimeStampedMixin):
     genres = models.ManyToManyField(
         Genre,
         through="GenreFilmWork",
-        related_name="genres",
+        related_name="film_work",
         verbose_name=_("genres"),
     )
     persons = models.ManyToManyField(
         Person,
         through="PersonFilmWork",
-        related_name="persons",
+        related_name="film_work",
         verbose_name=_("persons"),
     )
     certificate = models.CharField(
@@ -142,7 +142,7 @@ class GenreFilmWork(UUIDMixin):
     )
     genre = models.ForeignKey(
         Genre, on_delete=models.CASCADE,
-        related_name="genre",
+        related_name="genre_film_work",
         verbose_name=_("genre")
     )
     created = models.DateTimeField(
@@ -158,13 +158,13 @@ class PersonFilmWork(UUIDMixin):
     film_work = models.ForeignKey(
         FilmWork,
         on_delete=models.CASCADE,
-        related_name="persons_pfw",
+        related_name="person_film_work",
         verbose_name=_("film_work"),
     )
     person = models.ForeignKey(
         Person,
         on_delete=models.CASCADE,
-        related_name="film_works_pfw",
+        related_name="person_film_work",
         verbose_name=_("person"),
     )
     role = models.CharField(

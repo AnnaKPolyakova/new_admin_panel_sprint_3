@@ -28,21 +28,21 @@ if int(os.environ.get('LOGGING_ON', 0)) == 1:
                 'formatter': 'default',
                 'filters': ['require_debug_true'],
             },
-            'file': {
-                'level': LOG_LEVEL,
-                'class': 'logging.FileHandler',
-                'filename': LOG_FILE,
-                'formatter': 'verbose',
-            },
+            # 'file': {
+            #     'level': LOG_LEVEL,
+            #     'class': 'logging.FileHandler',
+            #     'filename': LOG_FILE,
+            #     'formatter': 'verbose',
+            # },
         },
         'loggers': {
-            'django.db.backends': {
-                'level': 'DEBUG',
-                'handlers': ['debug-console'],
-                'propagate': False,
-            },
+            # 'django.db.backends': {
+            #     'level': 'DEBUG',
+            #     'handlers': ['debug-console'],
+            #     'propagate': False,
+            # },
             'logger': {
-                'handlers': ['debug-console', 'file'],
+                'handlers': ['debug-console'],
                 'level': LOG_LEVEL,
                 'propagate': True,
             },
