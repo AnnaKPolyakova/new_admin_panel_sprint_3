@@ -1,7 +1,0 @@
-import os
-
-SETTINGS_FOR_CELERY = os.getenv("SETTINGS_FOR_CELERY")
-
-CELERY_CACHE_BACKEND = 'default'
-CELERY_BROKER_TRANSPORT_OPTIONS = {"visibility_timoit": 3600}
-CELERY_TIMEZONE = "Europe/Moscow"

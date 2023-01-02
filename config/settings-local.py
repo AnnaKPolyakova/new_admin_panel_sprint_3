@@ -8,7 +8,6 @@ include(
     "components/base/logging.py",
     "components/base/corsheaders_settings.py",
     "components/base/media_and_static.py",
-    "components/base/celery.py",
     "components/debug-local.py",
     "components/redis-local.py",
     "components/database-local.py",

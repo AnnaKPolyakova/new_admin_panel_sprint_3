@@ -28,11 +28,14 @@ class DBUpdater:
         logger.debug("Start update data in elasticsearch")
         self.film_work_qs = self.extractor.get_updated_film_work_queryset()
         len_data = len(self.film_work_qs)
+        if len_data == 0:
+            logger.debug("Nothing to update")
+            return
         self.data_list = Transformer(
             self.film_work_qs
         ).film_work_to_list_of_dict()
-        count = (len_data // settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH)
-        if len_data % settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH:
+        count = len_data // settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH
+        if count > 0 and len_data % settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH:
             count += 1
         for i in range(count):
             data_to_load = self.data_list[

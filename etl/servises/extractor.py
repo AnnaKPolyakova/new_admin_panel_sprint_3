@@ -17,11 +17,11 @@ from movies.models import (
 )
 
 MODELS_AND_FILTERS_FIELDS = {
-    LAST_EXTRACT_DATA_FOR_FILM_WORK: "modified__gte",
+    LAST_EXTRACT_DATA_FOR_FILM_WORK: "modified__gt",
     LAST_EXTRACT_DATA_FOR_PERSON:
-        "person_film_work__person__modified__gte",
+        "person_film_work__person__modified__gt",
     LAST_EXTRACT_DATA_FOR_GENRE:
-        "genre_film_work__genre__modified__gte",
+        "genre_film_work__genre__modified__gt",
 }
 
 MODELS_AND_DATA_FIELDS ={
@@ -49,7 +49,7 @@ class Extractor:
         self._new_objects_set = set()
 
     def _get_last_data(self, key_name):
-        self.redis_db.delete(key_name)
+        # self.redis_db.delete(key_name)
         data = self.redis_db.get(key_name)
         if not data:
             return
@@ -93,6 +93,8 @@ class Extractor:
             "genres",
             "persons"
         ).filter(**filters).order_by("modified")
+        if queryset.count() == 0:
+            return queryset
         self.film_new_date = queryset.filter(
                 modified__isnull=False
             ).last().modified
@@ -104,7 +106,8 @@ class Extractor:
             "genres",
             "persons"
         ).filter(**filters).order_by("person_film_work__person__modified")
-
+        if queryset.count() == 0:
+            return queryset
         self.person_new_date = max(
             queryset.filter(
                 persons__modified__isnull=False
@@ -118,6 +121,8 @@ class Extractor:
             "genres",
             "persons"
         ).filter(**filters).order_by("genre_film_work__genre__modified")
+        if queryset.count() == 0:
+            return queryset
         self.genre_new_date = max(
             queryset.filter(
                 genres__modified__isnull=False

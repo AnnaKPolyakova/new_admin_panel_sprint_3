@@ -4,6 +4,8 @@ LAST_EXTRACT_DATA_FOR_GENRE = "last_extract_data_for_genre"
 
 MOVIES = 'movies'
 
+TASK_ID = "task_id"
+
 MOVIES_INDEX = '''
 {
   "settings": {
