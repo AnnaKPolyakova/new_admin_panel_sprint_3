@@ -36,6 +36,11 @@ class Loader:
     def load_data(self, data):
         if len(data) == 0:
             return
-        self._load_data(data)
-        logger.debug("Start getting objects for updating")
-        return True
+        try:
+            self._load_data(data)
+        except Exception as error:
+            msg = "Loading get error {error}"
+            logger.debug(msg.format(error))
+            self._load_data(data)
+        logger.debug("loading done")
+        return
