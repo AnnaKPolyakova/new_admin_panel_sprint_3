@@ -49,7 +49,6 @@ class Extractor:
         self._new_objects_set = set()
 
     def _get_last_data(self, key_name):
-        # self.redis_db.delete(key_name)
         data = self.redis_db.get(key_name)
         if not data:
             return
