@@ -45,6 +45,12 @@ services:
       - media_value:/code/media/
     env_file:
       - ./.env
+    command: >
+      sh -c "./manage.py migrate &&
+      ./manage.py compilemessages -l en -l ru &&
+      ./manage.py collectstatic --no-input &&
+      gunicorn config.wsgi:application --bind 0.0.0.0:8000 --reload"
+
     depends_on:
       - db
       - redis
@@ -69,20 +75,25 @@ services:
   celery:
     build: .
     command: celery -A etl worker -l info
-
+    restart: always
     depends_on:
       - web
+      - db
       - redis
+      - elastic
 
   celery-beat:
     build: .
     command: celery -A etl beat -l info
+    restart: always
     volumes:
       - .:/code
     depends_on:
       - web
       - db
       - redis
+      - elastic
+      - celery
 
 volumes:
   postgres_data:

@@ -35,17 +35,8 @@ class Loader:
         helpers.bulk(self.elastic, data)
 
     def load_data(self, data):
-        time = 0
-        self.index_create()
         if len(data) == 0:
             return
-        try:
-            self._load_data(data)
-        except Exception as exeption:
-            logger.debug(LOADER_ERROR.format(error=exeption))
-            time += 20
-            self._load_data(data)
-            return False
-        else:
-            logger.debug("Start getting objects for updating")
+        self._load_data(data)
+        logger.debug("Start getting objects for updating")
         return True

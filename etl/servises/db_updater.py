@@ -1,7 +1,9 @@
 import logging
 
 from django.conf import settings
+from psycopg2 import OperationalError
 
+from etl.servises.backoff import backoff
 from etl.servises.extractor import Extractor
 from etl.servises.loader import Loader
 from etl.servises.transformer import Transformer
@@ -24,6 +26,8 @@ class DBUpdater:
     def _load_data(self, data):
         self.loader.load_data(data)
 
+    @backoff((OperationalError,))
+    @backoff((ConnectionError,))
     def update_data_in_elasticsearch(self):
         logger.debug("Start update data in elasticsearch")
         self.film_work_qs = self.extractor.get_updated_film_work_queryset()
@@ -37,6 +41,7 @@ class DBUpdater:
         count = len_data // settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH
         if count > 0 and len_data % settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH:
             count += 1
+        self.loader.index_create()
         for i in range(count):
             data_to_load = self.data_list[
                 settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH * i:

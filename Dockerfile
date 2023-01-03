@@ -5,7 +5,4 @@ RUN pip3 install -r /requirements.txt
 RUN apt update
 RUN apt install -y gettext
 COPY . .
-COPY entrypoint.sh /
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
 
