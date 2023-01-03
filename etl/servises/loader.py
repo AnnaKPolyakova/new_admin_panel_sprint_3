@@ -1,11 +1,9 @@
 import logging
 
-from elasticsearch import Elasticsearch, helpers
 from django.conf import settings
+from elasticsearch import Elasticsearch, helpers
 
-from etl.servises.defines import (
-    MOVIES_INDEX, MOVIES,
-)
+from etl.servises.defines import MOVIES, MOVIES_INDEX
 
 logger = logging.getLogger("logger")
 
@@ -13,16 +11,17 @@ LOADER_ERROR = "Loading invalid, error: {error}"
 
 
 class Loader:
-
     def __init__(self):
         self.elastic = self._get_elastic()
 
     @staticmethod
     def _get_elastic():
         url = (
-                settings.ELASTICSEARCH_PROTOCOL + '://' +
-                settings.ELASTICSEARCH_HOSTNAME + ":" +
-                str(settings.ELASTICSEARCH_PORT)
+            settings.ELASTICSEARCH_PROTOCOL
+            + "://"
+            + settings.ELASTICSEARCH_HOSTNAME
+            + ":"
+            + str(settings.ELASTICSEARCH_PORT)
         )
         return Elasticsearch(url)
 

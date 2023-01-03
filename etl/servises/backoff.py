@@ -2,15 +2,15 @@ import time
 from functools import wraps
 from typing import Any, Callable, TypeVar, Union
 
-F = TypeVar('F', bound=Callable[..., Any])
+F = TypeVar("F", bound=Callable[..., Any])
 
 
 def backoff(
-        exceptions: tuple,
-        start_sleep_time: Union[int, float] = 0.1,
-        factor: Union[int, float] = 2,
-        border_sleep_time: Union[int, float] = 10,
-        ) -> Callable[[F], F]:
+    exceptions: tuple,
+    start_sleep_time: Union[int, float] = 0.1,
+    factor: Union[int, float] = 2,
+    border_sleep_time: Union[int, float] = 10,
+) -> Callable[[F], F]:
     """
     Функция для повторного выполнения функции через некоторое время,
     если возникла ошибка. Использует наивный экспоненциальный рост времени
@@ -24,6 +24,7 @@ def backoff(
     :param border_sleep_time: граничное время ожидания
     :return: результат выполнения функции
     """
+
     def func_wrapper(func: Callable[[F], F]) -> Callable[[F], F]:
         @wraps(func)
         def inner(*args, **kwargs):
@@ -35,5 +36,7 @@ def backoff(
                 if sleep_time > border_sleep_time:
                     sleep_time = border_sleep_time
                 time.sleep(sleep_time)
+
         return inner
+
     return func_wrapper

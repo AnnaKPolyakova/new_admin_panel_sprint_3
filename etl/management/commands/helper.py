@@ -1,11 +1,10 @@
 import datetime
 
-
 from django.core.management.base import BaseCommand
 
 from etl.servises.db_updater import DBUpdater
-from etl.servises.defines import MOVIES_INDEX, MOVIES, \
-    LAST_EXTRACT_DATA_FOR_FILM_WORK
+from etl.servises.defines import (LAST_EXTRACT_DATA_FOR_FILM_WORK, MOVIES,
+                                  MOVIES_INDEX)
 from etl.servises.extractor import Extractor
 from etl.servises.loader import Loader
 from movies.models import FilmWork

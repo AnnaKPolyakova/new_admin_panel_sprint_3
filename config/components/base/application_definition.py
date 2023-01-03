@@ -1,6 +1,5 @@
 from config.components.debug import DEBUG
 
-
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",

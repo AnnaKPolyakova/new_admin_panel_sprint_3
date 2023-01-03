@@ -26,28 +26,34 @@ class Transformer:
             "title": obj.title,
             "description": obj.description,
             "director": [
-                str(person.full_name) for person in obj.persons.filter(
-                    person_film_work__role='director'
+                str(person.full_name)
+                for person in obj.persons.filter(
+                    person_film_work__role="director"
                 )
             ],
             "actors_names": [
-                str(person.full_name) for person in obj.persons.filter(
-                    person_film_work__role='actor'
+                str(person.full_name)
+                for person in obj.persons.filter(
+                    person_film_work__role="actor"
                 )
             ],
             "writers_names": [
-                str(person.full_name) for person in obj.persons.filter(
-                    person_film_work__role='writer'
+                str(person.full_name)
+                for person in obj.persons.filter(
+                    person_film_work__role="writer"
                 )
             ],
             "actors": [
-                self._person_to_dict(person) for person in obj.persons.filter(
-                    person_film_work__role='actor'
+                self._person_to_dict(person)
+                for person in obj.persons.filter(
+                    person_film_work__role="actor"
                 )
             ],
             "writers": [
-                self._person_to_dict(person) for person in
-                obj.persons.filter(person_film_work__role='writer')
+                self._person_to_dict(person)
+                for person in obj.persons.filter(
+                    person_film_work__role="writer"
+                )
             ],
         }
 
@@ -56,9 +62,9 @@ class Transformer:
         for obj in self.film_work_qs:
             self.film_works_list.append(
                 {
-                    '_index': MOVIES,
-                    '_id': str(obj.id),
-                    '_source': self._film_work_to_dict(obj)
+                    "_index": MOVIES,
+                    "_id": str(obj.id),
+                    "_source": self._film_work_to_dict(obj),
                 }
             )
         logger.debug("End transformation objects for updating")

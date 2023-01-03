@@ -2,11 +2,11 @@ LAST_EXTRACT_DATA_FOR_FILM_WORK = "last_extract_data_for_film_work"
 LAST_EXTRACT_DATA_FOR_PERSON = "last_extract_data_for_person"
 LAST_EXTRACT_DATA_FOR_GENRE = "last_extract_data_for_genre"
 
-MOVIES = 'movies'
+MOVIES = "movies"
 
 TASK_ID = "task_id"
 
-MOVIES_INDEX = '''
+MOVIES_INDEX = """
 {
   "settings": {
     "refresh_interval": "1s",
@@ -64,7 +64,7 @@ MOVIES_INDEX = '''
         "type": "text",
         "analyzer": "ru_en",
         "fields": {
-          "raw": { 
+          "raw": {
             "type":  "keyword"
           }
         }
@@ -113,4 +113,4 @@ MOVIES_INDEX = '''
       }
     }
   }
-}'''
+}"""

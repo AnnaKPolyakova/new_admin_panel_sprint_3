@@ -12,4 +12,3 @@ include(
     "components/database.py",
     "components/redis.py",
 )
-

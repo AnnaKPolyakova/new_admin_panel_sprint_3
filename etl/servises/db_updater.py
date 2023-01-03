@@ -12,11 +12,12 @@ from movies.models import FilmWork
 logger = logging.getLogger("logger")
 
 LOADED_DATA = "Loaded data for {number} part"
-DATA_LOADING_WAS_COMPLETED = "Data loading was completed for all (number) parts"
+DATA_LOADING_WAS_COMPLETED = (
+    "Data loading was completed for all (number) parts"
+)
 
 
 class DBUpdater:
-
     def __init__(self):
         self.loader = Loader()
         self.extractor = Extractor()
@@ -44,11 +45,11 @@ class DBUpdater:
         self.loader.index_create()
         for i in range(count):
             data_to_load = self.data_list[
-                settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH * i:
-                settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH * (i + 1)
+                settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH
+                * i: settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH
+                * (i + 1)
             ]
             self._load_data(data_to_load)
             logger.debug(LOADED_DATA.format(number=i + 1))
         logger.debug(DATA_LOADING_WAS_COMPLETED.format(numbers=count))
         self.extractor.set_last_data()
-

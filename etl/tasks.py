@@ -1,7 +1,7 @@
-from etl.celery import app
-from etl.servises.db_updater import DBUpdater
 from celery.utils.log import get_task_logger
 
+from etl.celery import app
+from etl.servises.db_updater import DBUpdater
 
 logger = get_task_logger(__name__)
 
