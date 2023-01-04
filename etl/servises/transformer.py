@@ -34,7 +34,7 @@ class Transformer:
               f'fw.description, ' \
               f'COALESCE (json_agg(DISTINCT p.full_name)' \
               f' FILTER (WHERE p.id is not null and ' \
-              f'pfw.role = \'director\')) ' \
+              f'pfw.role = \'director\'), \'[]\') ' \
               f'as director, ' \
               f'COALESCE (json_agg(DISTINCT p.full_name) ' \
               f'FILTER (WHERE p.id is not null and pfw.role = \'actor\')) ' \
