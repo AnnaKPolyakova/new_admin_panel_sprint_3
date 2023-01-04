@@ -2,6 +2,7 @@ import logging
 
 from django.conf import settings
 from elasticsearch import Elasticsearch, helpers
+from typing import Dict
 
 from etl.servises.defines import MOVIES, MOVIES_INDEX
 
@@ -12,7 +13,7 @@ LOADER_ERROR = "Loading invalid, error: {error}"
 
 class Loader:
     def __init__(self):
-        self.elastic = self._get_elastic()
+        self.elastic: Elasticsearch = self._get_elastic()
 
     @staticmethod
     def _get_elastic():
@@ -30,17 +31,17 @@ class Loader:
             index=MOVIES, ignore=400, body=MOVIES_INDEX
         )
 
-    def _load_data(self, data):
+    def _load_data(self, data: Dict):
         helpers.bulk(self.elastic, data)
 
-    def load_data(self, data):
+    def load_data(self, data: Dict):
         if len(data) == 0:
             return
         try:
             self._load_data(data)
         except Exception as error:
             msg = "Loading get error {error}"
-            logger.debug(msg.format(error))
+            logger.debug(msg.format(error=error))
             self._load_data(data)
         logger.debug("loading done")
         return

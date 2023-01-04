@@ -1,8 +1,10 @@
 import datetime
 import logging
+from django.db import connection
 
 import redis
 from django.conf import settings
+from typing import Set
 
 from etl.servises.defines import (LAST_EXTRACT_DATA_FOR_FILM_WORK,
                                   LAST_EXTRACT_DATA_FOR_GENRE,
@@ -31,15 +33,16 @@ NEW_DATES_SET = "New date {date} for updating was set for {obj_name}"
 
 class Extractor:
     def __init__(self):
-        self.redis_db = redis.Redis(
+        self.redis_db: redis.Redis = redis.Redis(
             host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0
         )
-        self.film_new_date = None
-        self.genre_new_date = None
-        self.person_new_date = None
-        self._new_objects_set = set()
+        self.film_new_date: datetime = None
+        self.genre_new_date: datetime = None
+        self.person_new_date: datetime = None
+        self._new_objects_set: Set[FilmWork] = set()
 
-    def _get_last_data(self, key_name):
+    def _get_last_data(self, key_name: str):
+        self.redis_db.delete(key_name)
         data = self.redis_db.get(key_name)
         if not data:
             return
@@ -78,68 +81,75 @@ class Extractor:
                 )
             )
 
-    def _get_filters(self, key_name):
-        data = self._get_last_data(key_name)
-        if data is not None:
-            return {MODELS_AND_FILTERS_FIELDS[key_name]: data}
-        return dict()
+    @staticmethod
+    def _get_sql_request(sql: str, date: str):
+        with connection.cursor() as cursor:
+            cursor.execute(sql, [date])
+            columns = [col[0] for col in cursor.description]
+            cursor = cursor.fetchall()
+            rows = [dict(zip(columns, row)) for row in cursor]
+        return rows
 
-    def _get_new_film_work(self):
-        filters = self._get_filters(LAST_EXTRACT_DATA_FOR_FILM_WORK)
-        queryset = (
-            FilmWork.objects.prefetch_related("genres", "persons")
-            .filter(**filters)
-            .order_by("modified")
-        )
-        if queryset.count() == 0:
-            return queryset
-        self.film_new_date = queryset.filter(
-            modified__isnull=False
-        ).last().modified
-        return queryset
+    def _get_new_film_works_ids(self):
+        date = self._get_last_data(LAST_EXTRACT_DATA_FOR_FILM_WORK)
+        sql = 'SELECT id, modified ' \
+              'FROM content.film_work as fw ' \
+              '{filter} ' \
+              'ORDER BY fw.modified ASC '
+        if date is None:
+            sql = sql.format(filter=' ')
+        else:
+            sql = sql.format(filter='WHERE fw.modified >  %s ')
+        objects = self._get_sql_request(sql, date)
+        if len(objects) > 0:
+            self.film_new_date = max(obj["modified"] for obj in objects)
+        return set(str(obj["id"]) for obj in objects)
 
     def _get_film_work_with_updated_person(self):
-        filters = self._get_filters(LAST_EXTRACT_DATA_FOR_PERSON)
-        queryset = (
-            FilmWork.objects.prefetch_related("genres", "persons")
-            .filter(**filters)
-            .order_by("person_film_work__person__modified")
-        )
-        if queryset.count() == 0:
-            return queryset
-        self.person_new_date = max(
-            queryset.filter(persons__modified__isnull=False).values_list(
-                "persons__modified", flat=True
-            )
-        )
-        return queryset
+        date = self._get_last_data(LAST_EXTRACT_DATA_FOR_PERSON)
+        sql = 'SELECT pfw.film_work_id, p.modified ' \
+              'FROM content.person as p ' \
+              'LEFT JOIN content.person_film_work as pfw ' \
+              'ON p.id = pfw.person_id ' \
+              '{filter} ' \
+              'ORDER BY p.modified ASC '
+        if date is None:
+            sql = sql.format(filter=' ')
+        else:
+            sql = sql.format(filter='WHERE p.modified >  %s ')
+        objects = self._get_sql_request(sql, date)
+        if len(objects) > 0:
+            self.person_new_date = max(obj["modified"] for obj in objects)
+        return set(str(obj["film_work_id"]) for obj in objects)
 
     def _get_film_work_with_updated_genres(self):
-        filters = self._get_filters(LAST_EXTRACT_DATA_FOR_GENRE)
-        queryset = (
-            FilmWork.objects.prefetch_related("genres", "persons")
-            .filter(**filters)
-            .order_by("genre_film_work__genre__modified")
-        )
-        if queryset.count() == 0:
-            return queryset
-        self.genre_new_date = max(
-            queryset.filter(genres__modified__isnull=False).values_list(
-                "genres__modified", flat=True
-            )
-        )
-        return queryset
+        date = self._get_last_data(LAST_EXTRACT_DATA_FOR_GENRE)
+        sql = 'SELECT gfw.film_work_id, g.modified ' \
+              'FROM content.genre as g ' \
+              'LEFT JOIN content.genre_film_work as gfw ' \
+              'ON g.id = gfw.genre_id ' \
+              '{filter} ' \
+              'ORDER BY g.modified ASC '
+        if date is None:
+            sql = sql.format(filter=' ')
+        else:
+            sql = sql.format(filter='WHERE g.modified >  %s ')
+        objects = self._get_sql_request(sql, date)
+        if len(objects) > 0:
+            self.genre_new_date = max(obj["modified"] for obj in objects)
+        return set(str(obj["film_work_id"]) for obj in objects)
 
-    def get_updated_film_work_queryset(self):
+    def get_updated_film_works_ids(self):
         logger.debug("Start getting objects for updating")
-        film_work_queryset = self._get_new_film_work()
-        queryset_with_updated_person = \
+        film_works_ids = self._get_new_film_works_ids()
+        film_works_ids_with_updated_person = \
             self._get_film_work_with_updated_person()
-        queryset_with_updated_genres = \
+        film_works_ids_with_updated_genres = \
             self._get_film_work_with_updated_genres()
-        film_work_queryset.union(
-            queryset_with_updated_person, queryset_with_updated_genres
+        film_works_ids.union(
+            film_works_ids_with_updated_person,
+            film_works_ids_with_updated_genres
         )
-        count = film_work_queryset.count()
+        count = len(film_works_ids)
         logger.debug(FINISHED_GETTING_OBJECTS.format(count=count))
-        return film_work_queryset
+        return film_works_ids

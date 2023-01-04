@@ -1,7 +1,9 @@
 import logging
+import uuid
 
 from django.conf import settings
 from psycopg2 import OperationalError
+from typing import List, Dict
 
 from etl.servises.backoff import backoff
 from etl.servises.extractor import Extractor
@@ -21,23 +23,23 @@ class DBUpdater:
     def __init__(self):
         self.loader = Loader()
         self.extractor = Extractor()
-        self.film_work_qs = FilmWork.objects.none()
-        self.data_list = list()
+        self.film_works_ids: List[uuid.UUID] = list()
+        self.data_list: List[Dict] = list()
 
-    def _load_data(self, data):
+    def _load_data(self, data: List[Dict]):
         self.loader.load_data(data)
 
     @backoff((OperationalError,))
     @backoff((ConnectionError,))
     def update_data_in_elasticsearch(self):
         logger.debug("Start update data in elasticsearch")
-        self.film_work_qs = self.extractor.get_updated_film_work_queryset()
-        len_data = len(self.film_work_qs)
+        self.film_works_ids = self.extractor.get_updated_film_works_ids()
+        len_data = len(self.film_works_ids)
         if len_data == 0:
             logger.debug("Nothing to update")
             return
         self.data_list = Transformer(
-            self.film_work_qs
+            self.film_works_ids
         ).film_work_to_list_of_dict()
         count = len_data // settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH
         if count > 0 and len_data % settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH:

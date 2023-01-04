@@ -1,8 +1,11 @@
+import logging
 import time
 from functools import wraps
 from typing import Any, Callable, TypeVar, Union
 
 F = TypeVar("F", bound=Callable[..., Any])
+
+logger = logging.getLogger("logger")
 
 
 def backoff(
@@ -31,7 +34,9 @@ def backoff(
             sleep_time = start_sleep_time
             try:
                 return func(*args, **kwargs)
-            except exceptions:
+            except exceptions as error:
+                msg = "Error {error} from funk: {func}"
+                logger.debug(msg.format(error=error, func=func.__name__))
                 sleep_time = sleep_time * factor
                 if sleep_time > border_sleep_time:
                     sleep_time = border_sleep_time
