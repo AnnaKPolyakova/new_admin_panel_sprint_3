@@ -24,46 +24,47 @@ class Transformer:
         }
 
     def _film_work_to_dict(self):
-        sql = f'SELECT ' \
-              f'fw.id::text, ' \
-              f'fw.rating as imdb_rating, ' \
-              f'COALESCE (json_agg(DISTINCT g.name) ' \
-              f'FILTER (WHERE g.id is not null)) ' \
-              f'as genre, ' \
-              f'fw.title, ' \
-              f'fw.description, ' \
-              f'COALESCE (json_agg(DISTINCT p.full_name)' \
-              f' FILTER (WHERE p.id is not null and ' \
-              f'pfw.role = \'director\'), \'[]\') ' \
-              f'as director, ' \
-              f'COALESCE (json_agg(DISTINCT p.full_name) ' \
-              f'FILTER (WHERE p.id is not null and pfw.role = \'actor\')) ' \
-              f'as actors_names, ' \
-              f'COALESCE (json_agg(DISTINCT p.full_name) ' \
-              f'FILTER (WHERE p.id is not null and pfw.role = \'writer\')) ' \
-              f'as writers_names, ' \
-              f'COALESCE (json_agg(DISTINCT jsonb_build_object(' \
-              f'\'id\', p.id,' \
-              f'\'name\', p.full_name' \
-              f')) FILTER (WHERE p.id is not null and pfw.role = \'actor\')) ' \
-              f'as actors, ' \
-              f'COALESCE (json_agg(DISTINCT jsonb_build_object(' \
-              f'\'id\', p.id,' \
-              f'\'name\', p.full_name' \
-              f')) FILTER (WHERE p.id is not null and ' \
-              f'pfw.role = \'writer\')) ' \
-              f'as writers ' \
-              f'FROM content.film_work fw ' \
-              f'LEFT JOIN content.person_film_work pfw ON pfw.film_work_id = ' \
-              f'fw.id ' \
-              f'LEFT JOIN content.person p ON p.id = pfw.person_id ' \
-              f'LEFT JOIN content.genre_film_work gfw ON gfw.film_work_id = ' \
-              f'fw.id ' \
-              f'LEFT JOIN content.genre g ON g.id = gfw.genre_id ' \
-              f'WHERE fw.id in %s ' \
-              f'GROUP BY fw.id ' \
-              f'ORDER BY fw.modified; ' \
-
+        sql = (
+            "SELECT "
+            "fw.id::text, "
+            "fw.rating as imdb_rating, "
+            "COALESCE (json_agg(DISTINCT g.name) "
+            "FILTER (WHERE g.id is not null)) "
+            "as genre, "
+            "fw.title, "
+            "fw.description, "
+            "COALESCE (json_agg(DISTINCT p.full_name)"
+            " FILTER (WHERE p.id is not null and "
+            "pfw.role = 'director'), '[]') "
+            "as director, "
+            "COALESCE (json_agg(DISTINCT p.full_name) "
+            "FILTER (WHERE p.id is not null and pfw.role = 'actor')) "
+            "as actors_names, "
+            "COALESCE (json_agg(DISTINCT p.full_name) "
+            "FILTER (WHERE p.id is not null and pfw.role = 'writer')) "
+            "as writers_names, "
+            "COALESCE (json_agg(DISTINCT jsonb_build_object("
+            "'id', p.id,"
+            "'name', p.full_name"
+            ")) FILTER (WHERE p.id is not null and pfw.role = 'actor')) "
+            "as actors, "
+            "COALESCE (json_agg(DISTINCT jsonb_build_object("
+            "'id', p.id,"
+            "'name', p.full_name"
+            ")) FILTER (WHERE p.id is not null and "
+            "pfw.role = 'writer')) "
+            "as writers "
+            "FROM content.film_work fw "
+            "LEFT JOIN content.person_film_work pfw ON pfw.film_work_id = "
+            "fw.id "
+            "LEFT JOIN content.person p ON p.id = pfw.person_id "
+            "LEFT JOIN content.genre_film_work gfw ON gfw.film_work_id = "
+            "fw.id "
+            "LEFT JOIN content.genre g ON g.id = gfw.genre_id "
+            "WHERE fw.id in %s "
+            "GROUP BY fw.id "
+            "ORDER BY fw.modified; "
+        )
         with connection.cursor() as cursor:
             cursor.execute(sql, [self.film_work_ids])
             columns = [col[0] for col in cursor.description]

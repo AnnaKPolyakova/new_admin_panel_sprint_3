@@ -6,9 +6,11 @@ import redis
 from django.conf import settings
 from typing import Set
 
-from etl.servises.defines import (LAST_EXTRACT_DATA_FOR_FILM_WORK,
-                                  LAST_EXTRACT_DATA_FOR_GENRE,
-                                  LAST_EXTRACT_DATA_FOR_PERSON)
+from etl.servises.defines import (
+    LAST_EXTRACT_DATA_FOR_FILM_WORK,
+    LAST_EXTRACT_DATA_FOR_GENRE,
+    LAST_EXTRACT_DATA_FOR_PERSON,
+)
 from movies.models import FilmWork, Genre, Person
 
 MODELS_AND_FILTERS_FIELDS = {
@@ -25,9 +27,8 @@ MODELS_AND_DATA_FIELDS = {
 
 logger = logging.getLogger("logger")
 
-FINISHED_GETTING_OBJECTS = (
-    "Finished getting objects for updating. Total count: {count}"
-)
+FINISHED_GETTING_OBJECTS = "Finished getting objects for updating. " \
+                           "Total count: {count}"
 NEW_DATES_SET = "New date {date} for updating was set for {obj_name}"
 
 
@@ -42,7 +43,6 @@ class Extractor:
         self._new_objects_set: Set[FilmWork] = set()
 
     def _get_last_data(self, key_name: str):
-        self.redis_db.delete(key_name)
         data = self.redis_db.get(key_name)
         if not data:
             return
@@ -52,7 +52,8 @@ class Extractor:
     def set_last_data(self):
         if self.film_new_date:
             self.redis_db.set(
-                LAST_EXTRACT_DATA_FOR_FILM_WORK, str(self.film_new_date)
+                LAST_EXTRACT_DATA_FOR_FILM_WORK,
+                str(self.film_new_date)
             )
             logger.debug(
                 NEW_DATES_SET.format(
@@ -62,7 +63,8 @@ class Extractor:
             )
         if self.genre_new_date:
             self.redis_db.set(
-                LAST_EXTRACT_DATA_FOR_GENRE, str(self.genre_new_date)
+                LAST_EXTRACT_DATA_FOR_GENRE,
+                str(self.genre_new_date)
             )
             logger.debug(
                 NEW_DATES_SET.format(
@@ -72,7 +74,8 @@ class Extractor:
             )
         if self.person_new_date:
             self.redis_db.set(
-                LAST_EXTRACT_DATA_FOR_PERSON, str(self.person_new_date)
+                LAST_EXTRACT_DATA_FOR_PERSON,
+                str(self.person_new_date)
             )
             logger.debug(
                 NEW_DATES_SET.format(
@@ -92,14 +95,16 @@ class Extractor:
 
     def _get_new_film_works_ids(self):
         date = self._get_last_data(LAST_EXTRACT_DATA_FOR_FILM_WORK)
-        sql = 'SELECT id, modified ' \
-              'FROM content.film_work as fw ' \
-              '{filter} ' \
-              'ORDER BY fw.modified ASC '
+        sql = (
+            "SELECT id, modified "
+            "FROM content.film_work as fw "
+            "{filter} "
+            "ORDER BY fw.modified ASC "
+        )
         if date is None:
-            sql = sql.format(filter=' ')
+            sql = sql.format(filter=" ")
         else:
-            sql = sql.format(filter='WHERE fw.modified >  %s ')
+            sql = sql.format(filter="WHERE fw.modified >  %s ")
         objects = self._get_sql_request(sql, date)
         if len(objects) > 0:
             self.film_new_date = max(obj["modified"] for obj in objects)
@@ -107,16 +112,18 @@ class Extractor:
 
     def _get_film_work_with_updated_person(self):
         date = self._get_last_data(LAST_EXTRACT_DATA_FOR_PERSON)
-        sql = 'SELECT pfw.film_work_id, p.modified ' \
-              'FROM content.person as p ' \
-              'LEFT JOIN content.person_film_work as pfw ' \
-              'ON p.id = pfw.person_id ' \
-              '{filter} ' \
-              'ORDER BY p.modified ASC '
+        sql = (
+            "SELECT pfw.film_work_id, p.modified "
+            "FROM content.person as p "
+            "LEFT JOIN content.person_film_work as pfw "
+            "ON p.id = pfw.person_id "
+            "{filter} "
+            "ORDER BY p.modified ASC "
+        )
         if date is None:
-            sql = sql.format(filter=' ')
+            sql = sql.format(filter=" ")
         else:
-            sql = sql.format(filter='WHERE p.modified >  %s ')
+            sql = sql.format(filter="WHERE p.modified >  %s ")
         objects = self._get_sql_request(sql, date)
         if len(objects) > 0:
             self.person_new_date = max(obj["modified"] for obj in objects)
@@ -124,16 +131,18 @@ class Extractor:
 
     def _get_film_work_with_updated_genres(self):
         date = self._get_last_data(LAST_EXTRACT_DATA_FOR_GENRE)
-        sql = 'SELECT gfw.film_work_id, g.modified ' \
-              'FROM content.genre as g ' \
-              'LEFT JOIN content.genre_film_work as gfw ' \
-              'ON g.id = gfw.genre_id ' \
-              '{filter} ' \
-              'ORDER BY g.modified ASC '
+        sql = (
+            "SELECT gfw.film_work_id, g.modified "
+            "FROM content.genre as g "
+            "LEFT JOIN content.genre_film_work as gfw "
+            "ON g.id = gfw.genre_id "
+            "{filter} "
+            "ORDER BY g.modified ASC "
+        )
         if date is None:
-            sql = sql.format(filter=' ')
+            sql = sql.format(filter=" ")
         else:
-            sql = sql.format(filter='WHERE g.modified >  %s ')
+            sql = sql.format(filter="WHERE g.modified >  %s ")
         objects = self._get_sql_request(sql, date)
         if len(objects) > 0:
             self.genre_new_date = max(obj["modified"] for obj in objects)

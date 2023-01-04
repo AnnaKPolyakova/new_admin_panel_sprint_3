@@ -9,14 +9,12 @@ from etl.servises.backoff import backoff
 from etl.servises.extractor import Extractor
 from etl.servises.loader import Loader
 from etl.servises.transformer import Transformer
-from movies.models import FilmWork
 
 logger = logging.getLogger("logger")
 
 LOADED_DATA = "Loaded data for {number} part"
-DATA_LOADING_WAS_COMPLETED = (
-    "Data loading was completed for all (number) parts"
-)
+DATA_LOADING_WAS_COMPLETED = "Data loading " \
+                             "was completed for all (number) parts"
 
 
 class DBUpdater:
@@ -38,9 +36,8 @@ class DBUpdater:
         if len_data == 0:
             logger.debug("Nothing to update")
             return
-        self.data_list = Transformer(
-            self.film_works_ids
-        ).film_work_to_list_of_dict()
+        self.data_list = \
+            Transformer(self.film_works_ids).film_work_to_list_of_dict()
         count = len_data // settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH
         if count > 0 and len_data % settings.SIZE_FOR_LOAD_TO_ELASTICSEARCH:
             count += 1
