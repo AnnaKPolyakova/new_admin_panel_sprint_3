@@ -34,5 +34,5 @@ Django
 * `docker-compose -f docker-compose-local.yml up --build` - создать и запустить контейнеры docker
 * `python manage.py runserver --settings config.settings-local` - запускаем 
   проект
-* `celery -A logs worker -l info` - запускаем воркер celery
-* `celery -A logs bear -l info` - запускаем beat celery
+* `celery -A etl worker -l info` - запускаем воркер celery
+* `celery -A etl beat -l info` - запускаем beat celery
