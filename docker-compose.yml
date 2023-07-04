@@ -14,6 +14,8 @@ services:
       timeout: 2s
       retries: 30
     restart: always
+    networks:
+      - moves_network
 
   redis:
     image: redis
@@ -25,6 +27,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - moves_network
 
   elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
@@ -36,9 +40,12 @@ services:
       - db
       - redis
     restart: always
+    networks:
+      - moves_network
 
   web:
     build: .
+#    image: sova040888/new_admin_panel:latest
     restart: always
     volumes:
       - static_value:/code/static/
@@ -55,6 +62,8 @@ services:
       - db
       - redis
       - elastic
+    networks:
+      - moves_network
 
   nginx:
     image: nginx:1.19.3
@@ -71,9 +80,12 @@ services:
       - db
       - redis
       - elastic
+    networks:
+      - moves_network
 
   celery:
     build: .
+#    image: sova040888/new_admin_panel:latest
     command: celery -A etl worker -l info
     restart: always
     depends_on:
@@ -81,9 +93,12 @@ services:
       - db
       - redis
       - elastic
+    networks:
+      - moves_network
 
   celery-beat:
     build: .
+#    image: sova040888/new_admin_panel:latest
     command: celery -A etl beat -l info
     restart: always
     volumes:
@@ -94,8 +109,15 @@ services:
       - redis
       - elastic
       - celery
+    networks:
+      - moves_network
 
 volumes:
   postgres_data:
   static_value:
   media_value:
+
+networks:
+  moves_network:
+    name: moves_network
+    external: true

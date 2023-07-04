@@ -17,7 +17,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     "run-me-every-ten-seconds": {
         "task": "etl.tasks.loader",
-        "schedule": crontab(minute=1),
-        # "schedule": crontab(1),
+        # "schedule": crontab(minute=1),
+        "schedule": crontab(1),
     }
 }

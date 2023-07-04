@@ -17,6 +17,8 @@ services:
 
     ports:
       - 5432:5432
+    networks:
+      - moves_network
 
   elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
@@ -25,6 +27,8 @@ services:
     ports:
       - "9200:9200"
     restart: always
+    networks:
+      - moves_network
 
   redis:
     image: redis
@@ -36,3 +40,10 @@ services:
     depends_on:
       - db
       - elastic
+    networks:
+      - moves_network
+
+networks:
+  moves_network:
+    name: moves_network
+    external: true
