@@ -11,7 +11,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "127.0.0.1").split(" ")
 
-CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1", "http://51.250.104.105"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
