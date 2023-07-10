@@ -12,7 +12,9 @@ class Command(BaseCommand):
     help = 'Loader'
 
     def handle(self, *args, **options):
+        print('start')
         logger.info("Loader tasks is on")
         updater = DBUpdater()
         updater.update_data_in_elasticsearch()
         logger.info("Loader tasks is finished")
+        print('end')
