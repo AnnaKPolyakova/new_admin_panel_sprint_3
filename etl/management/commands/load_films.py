@@ -1,10 +1,11 @@
-from celery.utils.log import get_task_logger
+import logging
+
 from django.core.management.base import BaseCommand
 
 from etl.servises.db_updater import DBUpdater
 
 
-logger = get_task_logger(__name__)
+logger = logging.getLogger("logger")
 
 
 class Command(BaseCommand):

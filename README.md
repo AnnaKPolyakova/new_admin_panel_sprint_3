@@ -36,3 +36,9 @@ Django
   проект
 * `celery -A etl worker -l info` - запускаем worker celery
 * `celery -A etl beat -l info` - запускаем beat celery
+
+#### Загрузка через management
+
+* `python manage.py load_films'
+ или
+* `python manage.py load_films --settings config.settings-local'
