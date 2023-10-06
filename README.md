@@ -1,44 +1,44 @@
-# Загрузчик данных в Elasticsearch из PostgreSQL.
+# Data loader into Elasticsearch from PostgreSQL.
 
-Технологии и требования:
+Technologies and requirements:
 ```
 Python 3.9+
 Django
 ```
 
-### Настройки Docker
+### Docker Settings
 
-##### Установка
+##### Installation
 
-* [Подробное руководство по установке](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+* [Detailed installation guide](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 
-### Настройки Docker-compose
+### Docker-compose settings
 
-##### Установка
+##### Installation
 
-* [Подробное руководство по установке](https://docs.docker.com/compose/install/)
+* [Detailed Installation Guide](https://docs.docker.com/compose/install/)
 
-### Запуск приложения
+### Launch the application
 
-#### Перед запуском проекта создаем переменные окружения
-Создаем в корне .env и добавляем в него необходимые переменные
-Пример для частичного запуска в контейнерах .env.example-local
-Пример для полного запуска в контейнерах .env.example-docker
+#### Before starting the project, create environment variables
+Create a .env in the root and add the necessary variables to it
+Example for partial running in .env.example-local containers
+Example for full run in .env.example-docker containers
 
-#### Запуск проекта полностью в контейнерах docker
+#### Running a project entirely in docker containers
 
 * `docker-compose up --build`
 
-#### Команды для запуска bd в контейнере + приложения локально
+#### Commands for running bd in a container + applications locally
 
-* `docker-compose -f docker-compose-local.yml up --build` - создать и запустить контейнеры docker
-* `python manage.py runserver --settings config.settings-local` - запускаем 
-  проект
-* `celery -A etl worker -l info` - запускаем worker celery
-* `celery -A etl beat -l info` - запускаем beat celery
+* `docker-compose -f docker-compose-local.yml up --build` - create and run docker containers
+* `python manage.py runserver --settings config.settings-local` - run
+   project
+* `celery -A etl worker -l info` - launch worker celery
+* `celery -A etl beat -l info` - run beat celery
 
-#### Загрузка через management
+#### Loading via management
 
 * `python manage.py load_films'
- или
+  or
 * `python manage.py load_films --settings config.settings-local'
